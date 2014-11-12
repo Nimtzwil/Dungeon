@@ -189,10 +189,10 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
     }
     else{   //else create rooms
         rooms[index-1].exists=true;
-        rooms[index-1].Ux=rnd->getInt(ULx+2,(LRx-ULx)/2 +ULx-1);
-        rooms[index-1].Uy=rnd->getInt(ULy+2,(LRy-ULy)/2 +ULy-1);
-        rooms[index-1].Lx=rnd->getInt((LRx-ULx)/2 +ULx+1,LRx-2);
-        rooms[index-1].Ly=rnd->getInt((LRy-ULy)/2 +ULy+1,LRy-2);
+        rooms[index-1].Ux=rnd->getInt(ULx+2,(LRx-ULx)/2 +ULx-2);
+        rooms[index-1].Uy=rnd->getInt(ULy+2,(LRy-ULy)/2 +ULy-2);
+        rooms[index-1].Lx=rnd->getInt((LRx-ULx)/2 +ULx+2,LRx-2);
+        rooms[index-1].Ly=rnd->getInt((LRy-ULy)/2 +ULy+2,LRy-2);
         
         for (int i=rooms[index-1].Ux; i <= rooms[index-1].Lx; i++){
             for (int j=rooms[index-1].Uy; j <= rooms[index-1].Ly; j++){
