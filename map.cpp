@@ -196,7 +196,7 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
         
         for (int i=rooms[index-1].Ux; i <= rooms[index-1].Lx; i++){
             for (int j=rooms[index-1].Uy; j <= rooms[index-1].Ly; j++){
-                tiles[i+j*width].canWalk = true;
+                tiles[i+j*width].canWalk = false;
             }
         }
     }
