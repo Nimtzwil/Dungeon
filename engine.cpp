@@ -5,12 +5,12 @@
 #include "engine.h"
 
 Engine::Engine() {
-    TCODConsole::initRoot(81,49,"Maze Runner",false);
+    TCODConsole::initRoot(81,49,"Dungeon",false);
     player = new Actor(39,25,'@',TCODColor::lightAmber,0,1);
     actors.insertBefore(player,0);
     //insertBefore (___,0) will put the actor in the first spot so player (pos last) gets rendered last thus on top
-    //actors.insertBefore(new Actor(61,13,25,TCODColor::blue,1,1),0);
-    //actors.insertBefore(new Actor(19,39,140,TCODColor::yellow,3,1),0);
+    actors.insertBefore(new Actor(10,10,25,TCODColor::blue,1,1),0);
+    actors.insertBefore(new Actor(30,29,140,TCODColor::yellow,3,1),0);
     map = new Map(81,45);
     gui = new GUI();
 }

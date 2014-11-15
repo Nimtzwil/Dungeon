@@ -145,6 +145,7 @@ void Map::Daedalus() {	//builds a dungeon
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
     Partition(0,0,width-1,height-1,0,rnd, inindex);
+    makeHallway(10,10,30,29);
     delete rnd;
 }
 
@@ -188,7 +189,7 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
         }
     }
     else{   //else create rooms
-        rooms[index-1].exists=true;
+        rooms[index-1].exists=true; //choose random size
         rooms[index-1].Ux=rnd->getInt(ULx+2,(LRx-ULx)/2 +ULx-2);
         rooms[index-1].Uy=rnd->getInt(ULy+2,(LRy-ULy)/2 +ULy-2);
         rooms[index-1].Lx=rnd->getInt((LRx-ULx)/2 +ULx+2,LRx-2);
@@ -196,8 +197,41 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
         
         for (int i=rooms[index-1].Ux; i <= rooms[index-1].Lx; i++){
             for (int j=rooms[index-1].Uy; j <= rooms[index-1].Ly; j++){
-                tiles[i+j*width].canWalk = false;
+                tiles[i+j*width].canWalk = false;   //carve out room
             }
         }
+    }
+}
+
+void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
+    int dx = Ex-Sx;
+    int dy = Ey-Sy;
+    int x = Sx;
+    int y = Sy;
+    int temp = 0;
+    int pasttemp = 0;
+    
+    tiles[x+y*width].canWalk = true;
+
+    if(abs(dx) > abs(dy)){
+        //x--;
+        while(((x!=Ex)||(y!=Ey))&&(x<width-1)&&(y<height-1)){
+//                              |         debug           |
+            pasttemp = temp;
+            temp = floor((dy*(x-Sx+1))/(abs(dx)));
+            if(abs(temp) <= pasttemp){
+                x = x+(dx/abs(dx));
+                tiles[x+y*width].canWalk = true;
+            }
+            else{
+                x = x+(dx/abs(dx));
+                tiles[x+y*width].canWalk = true;
+                y = y+(dy/abs(dy));
+                tiles[x+y*width].canWalk = true;                
+            }
+        }
+    }
+    else{
+        
     }
 }
