@@ -4,7 +4,6 @@
 #include <string>
 
 GUI::GUI(){
-    misc = 42;
     borderColor = TCODColor::darkRed;
 }
 

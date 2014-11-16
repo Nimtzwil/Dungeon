@@ -1,6 +1,5 @@
 class GUI{
 public:
-    int misc;
     TCODColor borderColor;
 
     GUI();

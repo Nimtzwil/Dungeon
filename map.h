@@ -37,6 +37,7 @@ public:
     void Daedalus();	//builds a dungeon
     void Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *rnd, int index);
     void makeHallway(int Sx, int Sy, int Ex, int Ey);
+    void connectRooms();
 private:
     Tile *tiles;
     Room *rooms;

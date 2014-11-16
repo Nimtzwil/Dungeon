@@ -148,7 +148,8 @@ void Map::Daedalus() {	//builds a dungeon
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
     Partition(0,0,width-1,height-1,0,rnd, inindex);
-    makeHallway(10,10,20,15);
+    //makeHallway(10,10,20,15);
+    connectRooms();
     delete rnd;
 }
 
@@ -247,6 +248,40 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
             tiles[x+y*width].canWalk = true;
             (*minor) = (*minor)+((*dmin)/abs(*dmin));
             tiles[x+y*width].canWalk = true;                
+        }
+    }
+}
+
+void Map::connectRooms(){
+    int CRx = 0;
+    int CRy = 0;
+    int CLx = 0;
+    int CLy = 0;
+    int find = 0;
+
+    for(int index = floor(maxRooms/2); index>0; index--){
+        if((rooms[2*index-1].exists)&&(rooms[2*index].exists)){
+            CRx = (int)((rooms[2*index-1].Lx-rooms[2*index-1].Ux)/2)+rooms[2*index-1].Ux;
+            CRy = (int)((rooms[2*index-1].Ly-rooms[2*index-1].Uy)/2)+rooms[2*index-1].Uy;
+            CLx = (int)((rooms[2*index].Lx-rooms[2*index].Ux)/2)+rooms[2*index].Ux;
+            CLy = (int)((rooms[2*index].Ly-rooms[2*index].Uy)/2)+rooms[2*index].Uy;
+
+            makeHallway(CRx,CRy,CLx,CLy);
+        }
+        else{
+            find = 2*index;
+            while(!(rooms[find-1].exists)){
+                find = 2*find+1;
+            }
+            CRx = (int)((rooms[find-1].Lx-rooms[find-1].Ux)/2)+rooms[find-1].Ux;
+            CRy = (int)((rooms[find-1].Ly-rooms[find-1].Uy)/2)+rooms[find-1].Uy;
+
+            find = 2*index+1;
+            //while(!(rooms[find-1].exists)){
+            //    find = 2*find;
+            //}
+            CLx = (int)((rooms[find-1].Lx-rooms[find-1].Ux)/2)+rooms[find-1].Ux;
+            CLy = (int)((rooms[find-1].Ly-rooms[find-1].Uy)/2)+rooms[find-1].Uy;
         }
     }
 }
