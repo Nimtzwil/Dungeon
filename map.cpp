@@ -148,7 +148,7 @@ void Map::Daedalus() {	//builds a dungeon
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
     Partition(0,0,width-1,height-1,0,rnd, inindex);
-    makeHallway(30,30,10,10);
+    makeHallway(20,30,35,10);
     delete rnd;
 }
 
@@ -243,19 +243,19 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
     else{
         while((x!=Ex)||(y!=Ey)){
             pastdiag = diag;
-//determines y-val of next x
-            diag = floor(abs(dy*(x-Sx+(dx/abs(dx))))/(abs(dx)));
+//determines x-val of next y
+            diag = floor(abs(dx*(y-Sy+(dy/abs(dy))))/(abs(dy)));
 
             if(abs(diag) <= abs(pastdiag)){
-//if y-val doesnt increase by 1 move horizontal
-                x = x+(dx/abs(dx));
+//if x-val doesnt increase by 1 move horizontal
+                y = y+(dy/abs(dy));
                 tiles[x+y*width].canWalk = true;
             }
             else{
 //else move diagonal
-                x = x+(dx/abs(dx));
-                tiles[x+y*width].canWalk = true;
                 y = y+(dy/abs(dy));
+                tiles[x+y*width].canWalk = true;
+                x = x+(dx/abs(dx));
                 tiles[x+y*width].canWalk = true;                
             }
         }
