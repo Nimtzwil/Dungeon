@@ -148,7 +148,7 @@ void Map::Daedalus() {	//builds a dungeon
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
     Partition(0,0,width-1,height-1,0,rnd, inindex);
-    makeHallway(10,10,30,30);
+    makeHallway(10,10,20,15);
     delete rnd;
 }
 
@@ -200,7 +200,7 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
         
         for (int i=rooms[index-1].Ux; i <= rooms[index-1].Lx; i++){
             for (int j=rooms[index-1].Uy; j <= rooms[index-1].Ly; j++){
-                tiles[i+j*width].canWalk = false;   //carve out room
+                tiles[i+j*width].canWalk = true;   //carve out room
             }
         }
     }
@@ -217,75 +217,35 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
     int * dmin = &dy;
     int * major = &x;
     int * minor = &y;
-    int * Smaj = &Sx;
+    int Smaj = Sx;
     
     tiles[x+y*width].canWalk = true;
 
-//handles -pi/4<=theta<=pi/4 and 3pi/4<=theta<=5pi/4
-//    if(abs(dx) >= abs(dy)){
-//( &&(x<width-1)&&(y<height-1)&&(x>0)&&(y>0))
-//continues while not at destination /\ debug additions
-//        while((x!=Ex)||(y!=Ey)){
-//            pastdiag = diag;
-//determines y-val of next x
-//           diag = floor(abs(dy*(x-Sx+(dx/abs(dx))))/(abs(dx)));
-//
-//            if(abs(diag) <= abs(pastdiag)){
-//if y-val doesnt increase by 1 move horizontal
-//                x = x+(dx/abs(dx));
-//                tiles[x+y*width].canWalk = true;
-//            }
-//            else{
-//else move diagonal
-//                x = x+(dx/abs(dx));
-//                tiles[x+y*width].canWalk = true;
-//                y = y+(dy/abs(dy));
-//                tiles[x+y*width].canWalk = true;                
-//            }
-//        }
-//    }
-//handles pi/4<theta<3pi/4 and 5pi/4<theta<7pi/4
-//    else{
-//        while((x!=Ex)||(y!=Ey)){
-//            pastdiag = diag;
-//determines x-val of next y
-//            diag = floor(abs(dx*(y-Sy+(dy/abs(dy))))/(abs(dy)));
-//
-//            if(abs(diag) <= abs(pastdiag)){
-//if x-val doesnt increase by 1 move horizontal
-//                y = y+(dy/abs(dy));
-//                tiles[x+y*width].canWalk = true;
-//            }
-//            else{
-//else move diagonal
-//                y = y+(dy/abs(dy));
-//                tiles[x+y*width].canWalk = true;
-//                x = x+(dx/abs(dx));
-//                tiles[x+y*width].canWalk = true;                
-//            }
-//        }
-//    }
-
-    if (abs(dy)<abs(dx)){
+//flips values if needed
+    if (abs(dy)>abs(dx)){
         dmaj = &dy;
         dmin = &dx;
         major = &y;
         minor = &x;
-        Smaj = &Sy;
+        Smaj = Sy;
     }
 
+//continues while not at destination
     while((x!=Ex)||(y!=Ey)){
         pastdiag = diag;
-        diag = floor(abs((*dmin)*(*dmaj-*Smaj+(*dmaj/abs(*dmaj))))/(abs(*dmaj)));
+//determines value of next step
+        diag = floor(abs((*dmin)*((*major)-(Smaj)+((*dmaj)/abs(*dmaj))))/(abs(*dmaj)));
 
         if(abs(diag) <= abs(pastdiag)){
-            *major = *major+(*dmaj/abs(*dmaj));
+//if delta value < 1 move along major axis
+            (*major) = (*major)+((*dmaj)/abs(*dmaj));
             tiles[x+y*width].canWalk = true;
         }
         else{
-            *major = *major+(*dmaj/abs(*dmaj));
+//else move horizontal
+            (*major) = (*major)+((*dmaj)/abs(*dmaj));
             tiles[x+y*width].canWalk = true;
-            *minor = *minor+(*dmin/abs(*dmin));
+            (*minor) = (*minor)+((*dmin)/abs(*dmin));
             tiles[x+y*width].canWalk = true;                
         }
     }

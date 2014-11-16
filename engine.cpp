@@ -10,7 +10,7 @@ Engine::Engine() {
     actors.insertBefore(player,0);
     //insertBefore (___,0) will put the actor in the first spot so player (pos last) gets rendered last thus on top
     actors.insertBefore(new Actor(10,10,25,TCODColor::blue,1,1),0);
-    actors.insertBefore(new Actor(30,30,140,TCODColor::yellow,3,1),0);
+    actors.insertBefore(new Actor(20,15,140,TCODColor::yellow,3,1),0);
     map = new Map(81,45);
     gui = new GUI();
 }
