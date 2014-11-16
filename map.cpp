@@ -1,7 +1,10 @@
 #include <cmath>
+#include <iostream>//debug
 
 #include "libtcod.hpp"
 #include "map.h"
+
+using namespace std;
 
 Tile::Tile(){
     canWalk = true;
@@ -145,7 +148,7 @@ void Map::Daedalus() {	//builds a dungeon
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
     Partition(0,0,width-1,height-1,0,rnd, inindex);
-    makeHallway(10,10,30,29);
+    makeHallway(30,30,10,10);
     delete rnd;
 }
 
@@ -208,18 +211,19 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
     int dy = Ey-Sy;
     int x = Sx;
     int y = Sy;
-    int temp = 0;
-    int pasttemp = 0;
+    int diag = 0;
+    int pastdiag = 0;
     
     tiles[x+y*width].canWalk = true;
 
-    if(abs(dx) > abs(dy)){
+    if(abs(dx) >= abs(dy)){
         //x--;
-        while(((x!=Ex)||(y!=Ey))&&(x<width-1)&&(y<height-1)){
+        while(((x!=Ex)||(y!=Ey))&&(x<width-1)&&(y<height-1)&&(x>0)&&(y>0)){
 //                              |         debug           |
-            pasttemp = temp;
-            temp = floor((dy*(x-Sx+1))/(abs(dx)));
-            if(abs(temp) <= pasttemp){
+            pastdiag = diag;
+            diag = floor(abs(dy*(x-Sx+(dx/abs(dx))))/(abs(dx)));
+
+            if(abs(diag) <= abs(pastdiag)){
                 x = x+(dx/abs(dx));
                 tiles[x+y*width].canWalk = true;
             }
