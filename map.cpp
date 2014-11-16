@@ -216,18 +216,22 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
     
     tiles[x+y*width].canWalk = true;
 
+//handles -pi/4<=theta<=pi/4 and 3pi/4<=theta<=5pi/4
     if(abs(dx) >= abs(dy)){
-        //x--;
-        while(((x!=Ex)||(y!=Ey))&&(x<width-1)&&(y<height-1)&&(x>0)&&(y>0)){
-//                              |         debug           |
+//( &&(x<width-1)&&(y<height-1)&&(x>0)&&(y>0))
+//continues while not at destination /\ debug additions
+        while((x!=Ex)||(y!=Ey)){
             pastdiag = diag;
+//determines y-val of next x
             diag = floor(abs(dy*(x-Sx+(dx/abs(dx))))/(abs(dx)));
 
             if(abs(diag) <= abs(pastdiag)){
+//if y-val doesnt increase by 1 move horizontal
                 x = x+(dx/abs(dx));
                 tiles[x+y*width].canWalk = true;
             }
             else{
+//else move diagonal
                 x = x+(dx/abs(dx));
                 tiles[x+y*width].canWalk = true;
                 y = y+(dy/abs(dy));
@@ -235,7 +239,25 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
             }
         }
     }
+//handles pi/4<theta<3pi/4 and 5pi/4<theta<7pi/4
     else{
-        
+        while((x!=Ex)||(y!=Ey)){
+            pastdiag = diag;
+//determines y-val of next x
+            diag = floor(abs(dy*(x-Sx+(dx/abs(dx))))/(abs(dx)));
+
+            if(abs(diag) <= abs(pastdiag)){
+//if y-val doesnt increase by 1 move horizontal
+                x = x+(dx/abs(dx));
+                tiles[x+y*width].canWalk = true;
+            }
+            else{
+//else move diagonal
+                x = x+(dx/abs(dx));
+                tiles[x+y*width].canWalk = true;
+                y = y+(dy/abs(dy));
+                tiles[x+y*width].canWalk = true;                
+            }
+        }
     }
 }
