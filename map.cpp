@@ -183,6 +183,11 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
                 split = rnd->getInt(ULy,LRy);
             }
 
+            rooms[index-1].Ux=ULx;
+            rooms[index-1].Uy=ULy;
+            rooms[index-1].Lx=LRx;
+            rooms[index-1].Ly=LRy;
+
             if (breakout < 50){ //if valid line found recurse
                 Partition(ULx,ULy,LRx,split,depth+1,rnd,2*index);
                 Partition(ULx,split+1,LRx,LRy,depth+1,rnd,2*index+1);
@@ -259,29 +264,5 @@ void Map::connectRooms(){
     int CLy = 0;
     int find = 0;
 
-    for(int index = floor(maxRooms/2); index>0; index--){
-        if((rooms[2*index-1].exists)&&(rooms[2*index].exists)){
-            CRx = (int)((rooms[2*index-1].Lx-rooms[2*index-1].Ux)/2)+rooms[2*index-1].Ux;
-            CRy = (int)((rooms[2*index-1].Ly-rooms[2*index-1].Uy)/2)+rooms[2*index-1].Uy;
-            CLx = (int)((rooms[2*index].Lx-rooms[2*index].Ux)/2)+rooms[2*index].Ux;
-            CLy = (int)((rooms[2*index].Ly-rooms[2*index].Uy)/2)+rooms[2*index].Uy;
-
-            makeHallway(CRx,CRy,CLx,CLy);
-        }
-        else{
-            find = 2*index;
-            while(!(rooms[find-1].exists)){
-                find = 2*find+1;
-            }
-            CRx = (int)((rooms[find-1].Lx-rooms[find-1].Ux)/2)+rooms[find-1].Ux;
-            CRy = (int)((rooms[find-1].Ly-rooms[find-1].Uy)/2)+rooms[find-1].Uy;
-
-            find = 2*index+1;
-            //while(!(rooms[find-1].exists)){
-            //    find = 2*find;
-            //}
-            CLx = (int)((rooms[find-1].Lx-rooms[find-1].Ux)/2)+rooms[find-1].Ux;
-            CLy = (int)((rooms[find-1].Ly-rooms[find-1].Uy)/2)+rooms[find-1].Uy;
-        }
-    }
+    
 }
