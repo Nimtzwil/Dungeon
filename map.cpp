@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>//debug
+#include <list>
 
 #include "libtcod.hpp"
 #include "map.h"
@@ -148,8 +149,7 @@ void Map::Daedalus() {	//builds a dungeon
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
     Partition(0,0,width-1,height-1,0,rnd, inindex);
-    //makeHallway(10,10,20,15);
-    connectRooms();
+    connectChildren(1);
     delete rnd;
 }
 
@@ -257,12 +257,55 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
     }
 }
 
-void Map::connectRooms(){
-    int CRx = 0;
-    int CRy = 0;
-    int CLx = 0;
-    int CLy = 0;
-    int find = 0;
+std::list<int> Map::connectChildren(int index){
+//BSP indexing starts at 1 thus refs to rooms array are index-wanted-1
+    list<int> Lchildren;
+    list<int> Rchildren;
+    int leftConnector;
+    int rightConnector;
+    int CRx, CRy, CLx, CLy;
+    float curDis=0, minDis=0;
 
-    
+//creates list of "left" children and ensures they are merged
+    if(rooms[2*index-1].exists)
+        Lchildren.push_back(2*index);
+    else
+        Lchildren = connectChildren(2*index);
+
+//creates list of "right" children and ensures they are merged
+    if(rooms[2*index].exists)
+        Rchildren.push_back(2*index+1);
+    else
+        Rchildren = connectChildren(2*index+1);
+
+//looks through all pairs of left and right kids to find shortest path
+    for(int l : Lchildren){
+        for(int r : Rchildren){
+            CRx = (int)((rooms[r-1].Lx-rooms[r-1].Ux)/2) + rooms[r-1].Ux;
+            CRy = (int)((rooms[r-1].Ly-rooms[r-1].Uy)/2) + rooms[r-1].Uy;
+            CLx = (int)((rooms[l-1].Lx-rooms[l-1].Ux)/2) + rooms[l-1].Ux;
+            CLy = (int)((rooms[l-1].Ly-rooms[l-1].Uy)/2) + rooms[l-1].Uy;
+
+            curDis = sqrt(pow(CRx-CLx,2)+pow(CRy-CLy,2));
+            if((curDis<minDis)||(minDis==0)){
+                minDis = curDis;
+                leftConnector = l;
+                rightConnector = r;
+            }
+        }
+    }
+
+//finallize shortest path measurements
+    CRx = (int)((rooms[rightConnector-1].Lx-rooms[rightConnector-1].Ux)/2) + rooms[rightConnector-1].Ux;
+    CRy = (int)((rooms[rightConnector-1].Ly-rooms[rightConnector-1].Uy)/2) + rooms[rightConnector-1].Uy;
+    CLx = (int)((rooms[leftConnector-1].Lx-rooms[leftConnector-1].Ux)/2) + rooms[leftConnector-1].Ux;
+    CLy = (int)((rooms[leftConnector-1].Ly-rooms[leftConnector-1].Uy)/2) + rooms[leftConnector-1].Uy;
+
+//connect across path
+    makeHallway(CRx,CRy,CLx,CLy);
+
+//merge left and right lists to pass up
+    Lchildren.merge(Rchildren);
+
+    return Lchildren;
 }
