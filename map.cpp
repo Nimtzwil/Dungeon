@@ -5,8 +5,6 @@
 #include "libtcod.hpp"
 #include "map.h"
 
-using namespace std;
-
 Tile::Tile(){
     canWalk = true;
     Seen = false;
@@ -28,7 +26,7 @@ Map::Map(int width, int height) : width(width),height(height) {
     proceed = false;
     maxDepth = 5;
     maxRooms = std::pow(2, maxDepth+1) - 1;
-    rooms=new Room[maxRooms];
+    BSProoms=new Room[maxRooms];
     for(int i=0; i < width; i++){	//sets up outer walls on edge of screen
         setWall(i,0);
         setWall(i,height-1);
@@ -37,11 +35,11 @@ Map::Map(int width, int height) : width(width),height(height) {
         setWall(0,j);
         setWall(width-1,j);
     }
-    Daedalus();
+    BSPDaedalus();
 }
 
 Map::~Map() {
-    delete [] rooms;
+    delete [] BSProoms;
     delete [] tiles;
 }
 
@@ -130,7 +128,7 @@ void Map::render() const {
     }
 }
 
-void Map::Daedalus() {	//builds a dungeon
+void Map::BSPDaedalus() {	//builds a dungeon
     level++;
     moves = 0;
 
@@ -143,17 +141,17 @@ void Map::Daedalus() {	//builds a dungeon
     }
 
     for (int k=0; k <= maxRooms-1; k++){    //"resets" rooms
-        rooms[k].exists = false;
+        BSProoms[k].exists = false;
     }
 
     TCODRandom *rnd = new TCODRandom();
     int inindex = 1;
-    Partition(0,0,width-1,height-1,0,rnd, inindex);
-    connectChildren(1);
+    BSPPartition(0,0,width-1,height-1,0,rnd, inindex);
+    BSPconnectChildren(1);
     delete rnd;
 }
 
-void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *rnd, int index){
+void Map::BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *rnd, int index){
     int split = 0;
     int breakout = 0;
     int minSize = 8;    //appears to work like minSize+1 (eg. want 7 use 8)
@@ -168,11 +166,11 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
             }
 
             if (breakout < 50){ //if valid line found recurse
-                Partition(ULx,ULy,split,LRy,depth+1,rnd,2*index);
-                Partition(split+1,ULy,LRx,LRy,depth+1,rnd,2*index+1);
+                BSPPartition(ULx,ULy,split,LRy,depth+1,rnd,2*index);
+                BSPPartition(split+1,ULy,LRx,LRy,depth+1,rnd,2*index+1);
             }
             else{   //else tell to build room
-                Partition(ULx,ULy,LRx,LRy,maxDepth,rnd,index);
+                BSPPartition(ULx,ULy,LRx,LRy,maxDepth,rnd,index);
             }
         }
         else{   //split along y
@@ -183,32 +181,29 @@ void Map::Partition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *r
                 split = rnd->getInt(ULy,LRy);
             }
 
-            rooms[index-1].Ux=ULx;
-            rooms[index-1].Uy=ULy;
-            rooms[index-1].Lx=LRx;
-            rooms[index-1].Ly=LRy;
+            BSProoms[index-1].Ux=ULx;
+            BSProoms[index-1].Uy=ULy;
+            BSProoms[index-1].Lx=LRx;
+            BSProoms[index-1].Ly=LRy;
 
             if (breakout < 50){ //if valid line found recurse
-                Partition(ULx,ULy,LRx,split,depth+1,rnd,2*index);
-                Partition(ULx,split+1,LRx,LRy,depth+1,rnd,2*index+1);
+                BSPPartition(ULx,ULy,LRx,split,depth+1,rnd,2*index);
+                BSPPartition(ULx,split+1,LRx,LRy,depth+1,rnd,2*index+1);
             }
             else{   //else tell to build room
-                Partition(ULx,ULy,LRx,LRy,maxDepth,rnd,index);
+                BSPPartition(ULx,ULy,LRx,LRy,maxDepth,rnd,index);
             }
         }
     }
     else{   //else create rooms
-        rooms[index-1].exists=true; //choose random size
-        rooms[index-1].Ux=rnd->getInt(ULx+2,(LRx-ULx)/2 +ULx-2);
-        rooms[index-1].Uy=rnd->getInt(ULy+2,(LRy-ULy)/2 +ULy-2);
-        rooms[index-1].Lx=rnd->getInt((LRx-ULx)/2 +ULx+2,LRx-2);
-        rooms[index-1].Ly=rnd->getInt((LRy-ULy)/2 +ULy+2,LRy-2);
+        BSProoms[index-1].exists=true; //choose random size
+        BSProoms[index-1].Ux=rnd->getInt(ULx+2,(LRx-ULx)/2 +ULx-2);
+        BSProoms[index-1].Uy=rnd->getInt(ULy+2,(LRy-ULy)/2 +ULy-2);
+        BSProoms[index-1].Lx=rnd->getInt((LRx-ULx)/2 +ULx+2,LRx-2);
+        BSProoms[index-1].Ly=rnd->getInt((LRy-ULy)/2 +ULy+2,LRy-2);
+
+        makeRoom(BSProoms[index-1].Ux, BSProoms[index-1].Uy, BSProoms[index-1].Lx, BSProoms[index-1].Ly);
         
-        for (int i=rooms[index-1].Ux; i <= rooms[index-1].Lx; i++){
-            for (int j=rooms[index-1].Uy; j <= rooms[index-1].Ly; j++){
-                tiles[i+j*width].canWalk = true;   //carve out room
-            }
-        }
     }
 }
 
@@ -257,34 +252,42 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
     }
 }
 
-std::list<int> Map::connectChildren(int index){
+void Map::makeRoom(int LLx, int LLy, int URx, int URy){
+    for (int u=LLx; u <= URx; u++){
+        for (int t=LLy; t <= URy; t++){
+            tiles[u+t*width].canWalk = true;
+        }
+    }
+}
+
+std::list<int> Map::BSPconnectChildren(int index){
 //BSP indexing starts at 1 thus refs to rooms array are index-wanted-1
-    list<int> Lchildren;
-    list<int> Rchildren;
+    std::list<int> Lchildren;
+    std::list<int> Rchildren;
     int leftConnector;
     int rightConnector;
     int CRx, CRy, CLx, CLy;
     float curDis=0, minDis=0;
 
 //creates list of "left" children and ensures they are merged
-    if(rooms[2*index-1].exists)
+    if(BSProoms[2*index-1].exists)
         Lchildren.push_back(2*index);
     else
-        Lchildren = connectChildren(2*index);
+        Lchildren = BSPconnectChildren(2*index);
 
 //creates list of "right" children and ensures they are merged
-    if(rooms[2*index].exists)
+    if(BSProoms[2*index].exists)
         Rchildren.push_back(2*index+1);
     else
-        Rchildren = connectChildren(2*index+1);
+        Rchildren = BSPconnectChildren(2*index+1);
 
 //looks through all pairs of left and right kids to find shortest path
     for(int l : Lchildren){
         for(int r : Rchildren){
-            CRx = (int)((rooms[r-1].Lx-rooms[r-1].Ux)/2) + rooms[r-1].Ux;
-            CRy = (int)((rooms[r-1].Ly-rooms[r-1].Uy)/2) + rooms[r-1].Uy;
-            CLx = (int)((rooms[l-1].Lx-rooms[l-1].Ux)/2) + rooms[l-1].Ux;
-            CLy = (int)((rooms[l-1].Ly-rooms[l-1].Uy)/2) + rooms[l-1].Uy;
+            CRx = (int)((BSProoms[r-1].Lx-BSProoms[r-1].Ux)/2) + BSProoms[r-1].Ux;
+            CRy = (int)((BSProoms[r-1].Ly-BSProoms[r-1].Uy)/2) + BSProoms[r-1].Uy;
+            CLx = (int)((BSProoms[l-1].Lx-BSProoms[l-1].Ux)/2) + BSProoms[l-1].Ux;
+            CLy = (int)((BSProoms[l-1].Ly-BSProoms[l-1].Uy)/2) + BSProoms[l-1].Uy;
 
             curDis = sqrt(pow(CRx-CLx,2)+pow(CRy-CLy,2));
             if((curDis<minDis)||(minDis==0)){
@@ -296,10 +299,10 @@ std::list<int> Map::connectChildren(int index){
     }
 
 //finallize shortest path measurements
-    CRx = (int)((rooms[rightConnector-1].Lx-rooms[rightConnector-1].Ux)/2) + rooms[rightConnector-1].Ux;
-    CRy = (int)((rooms[rightConnector-1].Ly-rooms[rightConnector-1].Uy)/2) + rooms[rightConnector-1].Uy;
-    CLx = (int)((rooms[leftConnector-1].Lx-rooms[leftConnector-1].Ux)/2) + rooms[leftConnector-1].Ux;
-    CLy = (int)((rooms[leftConnector-1].Ly-rooms[leftConnector-1].Uy)/2) + rooms[leftConnector-1].Uy;
+    CRx = (int)((BSProoms[rightConnector-1].Lx-BSProoms[rightConnector-1].Ux)/2) + BSProoms[rightConnector-1].Ux;
+    CRy = (int)((BSProoms[rightConnector-1].Ly-BSProoms[rightConnector-1].Uy)/2) + BSProoms[rightConnector-1].Uy;
+    CLx = (int)((BSProoms[leftConnector-1].Lx-BSProoms[leftConnector-1].Ux)/2) + BSProoms[leftConnector-1].Ux;
+    CLy = (int)((BSProoms[leftConnector-1].Ly-BSProoms[leftConnector-1].Uy)/2) + BSProoms[leftConnector-1].Uy;
 
 //connect across path
     makeHallway(CRx,CRy,CLx,CLy);

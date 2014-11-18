@@ -67,7 +67,7 @@ void Engine::update() {	//checks for key presses
                 }
             }
             else if(key.c == 'g'){
-                map->Daedalus();
+                map->BSPDaedalus();
             }
         break;
 
@@ -87,7 +87,7 @@ void Engine::updateActors(){
     for (Actor **iterator=actors.begin(); iterator != actors.end()-1; iterator++) {
     	//resets map when reach drop down
         if((player->x==(*iterator)->x)&&(player->y==(*iterator)->y)&&((*iterator)->type == 1)&&(map->proceed == true)){
-            map->Daedalus();
+            map->BSPDaedalus();
 
             map->proceed = false;
         
