@@ -1,6 +1,8 @@
+#include <list>
+
 class Engine {
 public :
-    TCODList<Actor *> actors;
+    std::list<Actor *> actors;
     Actor *player;
     Map *map;
     GUI *gui;
@@ -10,6 +12,7 @@ public :
     void update();
     void updateActors();
     void render();
+    void populateMap();
 };
  
 extern Engine engine;

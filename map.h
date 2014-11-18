@@ -6,6 +6,7 @@ struct Tile {
     bool canWalk; 	// can we walk through this tile?
     bool Seen;		// has been seen by player
     bool Infered;	// has been on edge of vision
+    int occupied;
 
     Tile();
 };

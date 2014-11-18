@@ -1,5 +1,5 @@
 #include <cmath>
-#include <iostream>//debug
+//#include <iostream>//debug
 #include <list>
 
 #include "libtcod.hpp"
@@ -9,6 +9,7 @@ Tile::Tile(){
     canWalk = true;
     Seen = false;
     Infered = true;
+    occupied = 0;
 }
 
 Room::Room(){
