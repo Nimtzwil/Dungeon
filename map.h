@@ -1,4 +1,5 @@
 #include <list>
+#include <utility>
 
 #include "libtcod.hpp"
 
@@ -47,6 +48,8 @@ public:
 
     void makeHallway(int Sx, int Sy, int Ex, int Ey);
     void makeRoom(int LLx, int LLy, int Rwidth, int height);
+
+    std::pair<int,int> findValidPos(TCODRandom *rnd);
 
     void BSPDaedalus();	//builds a dungeon
     void BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *rnd, int index);

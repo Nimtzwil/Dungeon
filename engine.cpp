@@ -1,4 +1,5 @@
 #include <list>
+#include <utility>
 
 #include "libtcod.hpp"
 #include "actor.h"
@@ -9,16 +10,12 @@
 Engine::Engine() {
     TCODConsole::initRoot(81,49,"Dungeon",false);
     map = new Map(81,45);
-    player = new Actor(39,25,'@',TCODColor::lightAmber,0,1);
-    actors.push_front(player);
-    //insertBefore (___,0) will put the actor in the first spot so player (pos last) gets rendered last thus on top
-    actors.push_front(new Actor(10,10,25,TCODColor::blue,1,1));
-    actors.push_front(new Actor(20,15,140,TCODColor::yellow,3,1));
     gui = new GUI();
     populateMap();
 }
 
 Engine::~Engine() {
+//memory leak??? may have to DELETE each actor b/c started w/ new?
     actors.clear();
     delete map;
     delete gui;
@@ -94,11 +91,21 @@ void Engine::updateActors(){
             map->proceed = false;
         
             TCODRandom *rnd = new TCODRandom();
-                    //put dropdown to a random position
-            (*iterator)->x = (rnd->getInt(0,39)*2)+1;
-            (*iterator)->y = (rnd->getInt(0,21)*2)+1;
+            std::pair<int,int> position;
 
-            actors.push_front(new Actor((rnd->getInt(0,39)*2)+1,(rnd->getInt(0,21)*2)+1, 140, TCODColor::yellow, 3, 1));
+//put player in a random position
+            position = map->findValidPos(rnd);
+            player->x = position.first;
+            player->y = position.second;
+
+//put dropdown to a random position
+            position = map->findValidPos(rnd);
+            (*iterator)->x = position.first;
+            (*iterator)->y = position.second;
+
+//put key in random position
+            position = map->findValidPos(rnd);
+            actors.push_front(new Actor(position.first, position.second, 140, TCODColor::yellow, 3, 1));
 
             //TODO check the key and drop down cant spawn in same place
             delete rnd;
@@ -126,7 +133,7 @@ void Engine::updateActors(){
     }
 
     for (auto iterator=actors.begin(); iterator != actors.end(); iterator++) {
-        if((*iterator)->hp < 1){   //checks if each actor is dead
+        if((*iterator)->hp < 1){   //checks if each actor is dead           
             actors.remove((*iterator));
             iterator--;
         }
@@ -148,5 +155,18 @@ void Engine::render() {
 }
 
 void Engine::populateMap() {
+    TCODRandom *rnd = new TCODRandom();
+    std::pair<int,int> position;
+
+    position = map->findValidPos(rnd);
+    player = new Actor(position.first, position.second,'@',TCODColor::lightAmber,0,1);
+    actors.push_front(player);
+
+    position = map->findValidPos(rnd);
+    actors.push_front(new Actor(position.first, position.second,25,TCODColor::blue,1,1));
     
+    position = map->findValidPos(rnd);
+    actors.push_front(new Actor(position.first, position.second,140,TCODColor::yellow,3,1));
+
+    delete rnd;
 }

@@ -1,6 +1,7 @@
 #include <cmath>
 //#include <iostream>//debug
 #include <list>
+#include <utility>
 
 #include "libtcod.hpp"
 #include "map.h"
@@ -138,6 +139,7 @@ void Map::BSPDaedalus() {	//builds a dungeon
             tiles[i+j*width].Seen=false;	//for resetting the map
             tiles[i+j*width].Infered=true;
             tiles[i+j*width].canWalk = false;
+            tiles[i+j*width].occupied = 0;
         }
     }
 
@@ -312,4 +314,18 @@ std::list<int> Map::BSPconnectChildren(int index){
     Lchildren.merge(Rchildren);
 
     return Lchildren;
+}
+
+std::pair<int,int> Map::findValidPos(TCODRandom *rnd){
+    std::pair<int,int> place;
+    
+    place.first = rnd->getInt(0,width-1);
+    place.second = rnd->getInt(0,height-1);
+
+    while(isWall(place.first,place.second)){
+        place.first = rnd->getInt(0,width-1);
+        place.second = rnd->getInt(0,height-1);
+    }
+    
+    return place;
 }
