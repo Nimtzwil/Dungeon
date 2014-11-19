@@ -1,3 +1,6 @@
+#ifndef map_H
+#define map_H
+
 #include <list>
 #include <utility>
 
@@ -59,3 +62,4 @@ private:
     Tile *tiles;
     Room *BSProoms;
 };
+#endif

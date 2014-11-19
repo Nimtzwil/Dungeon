@@ -1,3 +1,6 @@
+#ifndef engine_H
+#define engine_H
+
 #include <list>
 
 class Engine {
@@ -16,3 +19,4 @@ public :
 };
  
 extern Engine engine;
+#endif

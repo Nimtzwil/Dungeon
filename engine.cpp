@@ -15,8 +15,9 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-//memory leak??? may have to DELETE each actor b/c started w/ new?
-    actors.clear();
+    for(auto each : actors){
+        delete each;
+    }
     delete map;
     delete gui;
 }
@@ -126,6 +127,11 @@ void Engine::updateActors(){
             (*iterator)->hp = 0;
         }
 
+        //if chest is found
+        else if((player->x==(*iterator)->x)&&(player->y==(*iterator)->y)&&((*iterator)->type == 4)){
+            (*iterator)->hp = 0;
+        }
+
         //decrements "scent" health
         else if((*iterator)->type == 2){
             (*iterator)->hp--;
@@ -157,6 +163,7 @@ void Engine::render() {
 void Engine::populateMap() {
     TCODRandom *rnd = new TCODRandom();
     std::pair<int,int> position;
+    int cntMax = 0;
 
     position = map->findValidPos(rnd);
     player = new Actor(position.first, position.second,'@',TCODColor::lightAmber,0,1);
@@ -167,6 +174,12 @@ void Engine::populateMap() {
     
     position = map->findValidPos(rnd);
     actors.push_front(new Actor(position.first, position.second,140,TCODColor::yellow,3,1));
+
+    cntMax = rnd->getInt(4,9);
+    for (int cnt = 0; cnt < cntMax; cnt++){
+        position = map->findValidPos(rnd);
+        actors.push_front(new Actor(position.first, position.second,8,TCODColor::darkFlame,4,1));
+    }
 
     delete rnd;
 }

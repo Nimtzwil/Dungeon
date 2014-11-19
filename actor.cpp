@@ -1,5 +1,6 @@
 #include "libtcod.hpp"
 #include "actor.h"
+#include "inventory.h"
 
 Actor::Actor(int x, int y, int ch, const TCODColor &col, int typ, int health):
     x(x),y(y),ch(ch),col(col) {
@@ -7,6 +8,11 @@ facing = 0;
 type = typ;
 hp = health;
 stinks = false;
+inv = new Inventory();
+}
+
+Actor::~Actor(){
+    delete inv;
 }
 
 void Actor::render() const{
