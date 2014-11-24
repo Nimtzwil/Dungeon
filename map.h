@@ -42,6 +42,7 @@ public:
 
     bool isSeen(int x, int y) const;
     void wasSeen(int x,int y);
+    void wasBlocked(int x, int y);
 
     bool isInfered(int x, int y) const;
     void wasInfered(int x, int y);

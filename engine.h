@@ -3,6 +3,10 @@
 
 #include <list>
 
+#include "actor.h"
+#include "map.h"
+#include "gui.h"
+
 class Engine {
 public :
     std::list<Actor *> actors;

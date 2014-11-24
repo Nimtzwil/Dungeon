@@ -1,7 +1,4 @@
 #include "libtcod.hpp"
-#include "actor.h"
-#include "map.h"
-#include "gui.h"
 #include "engine.h"
  
 Engine engine;

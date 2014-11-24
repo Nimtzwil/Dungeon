@@ -9,7 +9,7 @@
 Tile::Tile(){
     canWalk = true;
     Seen = false;
-    Infered = true;
+    Infered = false;
     occupied = 0;
 }
 
@@ -61,6 +61,10 @@ void Map::wasSeen(int x, int y) {	//tile was just seen
     tiles[x+y*width].Seen=true;
 }
 
+void Map::wasBlocked(int x, int y) {
+    tiles[x+y*width].Seen=false;
+}
+
 bool Map::isInfered(int x, int y) const {	//tile has been infered
     return tiles[x+y*width].Infered;
 }
@@ -70,7 +74,17 @@ void Map::wasInfered(int x, int y) {	//tile was just infered
 }
 
 void Map::newView(int x, int y, int fac) {
-    if(fac == 0){	//reveals all that are above
+    for (int mx=0; mx < width; mx++) {
+        for (int my=0; my < height; my++) {
+            if (floor(sqrt(pow((mx-x),2)+pow((my-y),2)))<5){
+                wasSeen(mx,my);
+                wasInfered(mx,my);
+            }
+            else
+                wasBlocked(mx,my);
+        }
+    }
+/*    if(fac == 0){	//reveals all that are above
         wasSeen(x-1,y);
         wasSeen(x+1,y);
         while(!isWall(x,y)){
@@ -113,7 +127,7 @@ void Map::newView(int x, int y, int fac) {
             wasInfered(x-1,y+1);
             x--;
         }
-    }
+    }*/
 }
 
 void Map::render() const {
