@@ -7,7 +7,7 @@ GUI::GUI(){
     borderColor = TCODColor::darkRed;
 }
 
-void GUI::render(bool smell, int level, bool proceed, int moves) const{
+void GUI::render(bool smell, int level, bool proceed, int moves, std::string equipped) const{
 
     //render edges in red
     TCODConsole::root->setChar(0,45,201);
@@ -93,6 +93,21 @@ void GUI::render(bool smell, int level, bool proceed, int moves) const{
 
     str = std::to_string(moves);
     for (char c: str){
+        TCODConsole::root->setChar(1+count,46,c);
+        TCODConsole::root->setCharForeground(1+count,46, TCODColor::chartreuse);
+        count++;
+    }
+
+    //render equipment
+    str = "   Equipped: ";
+    for (char c: str){
+        TCODConsole::root->setChar(1+count,46,c);
+        TCODConsole::root->setCharForeground(1+count,46, TCODColor::chartreuse);
+        count++;
+    }
+
+    //str = std::to_string(moves);
+    for (char c: equipped){
         TCODConsole::root->setChar(1+count,46,c);
         TCODConsole::root->setCharForeground(1+count,46, TCODColor::chartreuse);
         count++;

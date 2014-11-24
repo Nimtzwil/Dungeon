@@ -130,6 +130,7 @@ void Engine::updateActors(){
         //if chest is found
         else if((player->x==(*iterator)->x)&&(player->y==(*iterator)->y)&&((*iterator)->type == 4)){
             (*iterator)->hp = 0;
+            player->inv = (*iterator)->inv;
         }
 
         //decrements "scent" health
@@ -157,7 +158,7 @@ void Engine::render() {
     for (auto iterator=actors.begin(); iterator != actors.end(); iterator++) {
         (*iterator)->render();
     }
-    gui->render(player->stinks,map->level,map->proceed,map->moves);
+    gui->render(player->stinks,map->level,map->proceed,map->moves, player->inv->knapsack.front()->name);
 }
 
 void Engine::populateMap() {

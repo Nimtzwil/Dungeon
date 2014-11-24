@@ -3,6 +3,12 @@
 
 #include <list>
 #include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include "libtcod.hpp"
 
 struct Loot{
     int placeholder;
