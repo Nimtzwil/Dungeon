@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "libtcod.hpp"
+#include "genFcns.h"
 
 struct Tile {
     bool canWalk; 	// can we walk through this tile?

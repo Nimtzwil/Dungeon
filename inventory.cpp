@@ -7,6 +7,7 @@
 
 #include "libtcod.hpp"
 #include "inventory.h"
+#include "genFcns.h"
 
 Loot::Loot(){
     placeholder = 0;
@@ -16,13 +17,11 @@ Loot::Loot(){
 void Loot::createName(){
     static std::vector<std::string> styles = {"Iron", "Steel", "Orcish", "Dwarven", "Nord Hero", "Skyforge Steel", "Elven", "Nordic", "Glass", "Ebony", "Stalhrim", "Daedric", "Dragonbone"};
     static std::vector<std::string> types = {"Sword", "War Axe", "Mace", "Dagger", "Greatsword", "Battleaxe", "Warhammer", "Bow", "Crossbow"};
-    static TCODRandom rnd = TCODRandom();
+//    static TCODRandom rnd = TCODRandom();
 
-    name = styles[rnd.getInt(0,styles.size()-1)];
+    name = styles[getLinRnd(0,styles.size()-1)];
     name += " ";
-    name += types[rnd.getInt(0,types.size()-1)];
-
-    //delete rnd;
+    name += types[getLinRnd(0,types.size()-1)];
 }
 
 Inventory::Inventory(){
