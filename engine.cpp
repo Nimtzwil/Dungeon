@@ -11,7 +11,7 @@ Engine::Engine() {
     TCODConsole::initRoot(81,49,"Dungeon",false);
     map = new Map(81,45);
     gui = new GUI();
-    populateMap();
+    initializeMap();
 }
 
 Engine::~Engine() {
@@ -85,7 +85,7 @@ void Engine::updateActors(){
         actors.push_front(new Actor(player->x,player->y, 7, TCODColor::chartreuse, 2,12));
 
     for (auto iterator=actors.begin(); iterator != actors.end(); iterator++) {
-    	//resets map when reach drop down
+//resets map when reach drop down
         if((player->x==(*iterator)->x)&&(player->y==(*iterator)->y)&&((*iterator)->type == 1)&&(map->proceed == true)){
             map->BSPDaedalus();
 
@@ -93,6 +93,12 @@ void Engine::updateActors(){
         
             TCODRandom *rnd = new TCODRandom();
             std::pair<int,int> position;
+
+//kills all scent&chests on dropdown
+            for (auto iterator2=actors.begin(); iterator2 != actors.end(); iterator2++) {    
+                if(((*iterator2)->type == 2)||((*iterator2)->type == 4))
+                    (*iterator2)->hp = 0;
+            }
 
 //put player in a random position
             position = map->findValidPos(rnd);
@@ -104,17 +110,15 @@ void Engine::updateActors(){
             (*iterator)->x = position.first;
             (*iterator)->y = position.second;
 
-//put key in random position
+//put a key in random position
             position = map->findValidPos(rnd);
             actors.push_front(new Actor(position.first, position.second, 140, TCODColor::yellow, 3, 1));
 
+//place chests
+            populateMap(rnd);
+
             //TODO check the key and drop down cant spawn in same place
             delete rnd;
-
-            for (auto iterator2=actors.begin(); iterator2 != actors.end(); iterator2++) {    //kills all scent on dropdown
-                if((*iterator2)->type == 2)
-                    (*iterator2)->hp = 0;
-            }
             
             if(player->stinks)    //add new scent actor if stinky
                 actors.push_front(new Actor(player->x,player->y, 7, TCODColor::chartreuse, 2,11)); //adds scent actor where fallen
@@ -139,8 +143,9 @@ void Engine::updateActors(){
         }
     }
 
+//checks if each actor is dead
     for (auto iterator=actors.begin(); iterator != actors.end(); iterator++) {
-        if((*iterator)->hp < 1){   //checks if each actor is dead           
+        if((*iterator)->hp < 1){           
             actors.remove((*iterator));
             iterator--;
         }
@@ -161,26 +166,34 @@ void Engine::render() {
     gui->render(player->stinks,map->level,map->proceed,map->moves, player->inv->knapsack.front()->name);
 }
 
-void Engine::populateMap() {
+void Engine::initializeMap() {
     TCODRandom *rnd = new TCODRandom();
     std::pair<int,int> position;
-    int cntMax = 0;
 
+//place player
     position = map->findValidPos(rnd);
     player = new Actor(position.first, position.second,'@',TCODColor::lightAmber,0,1);
     actors.push_front(player);
 
+//place door
     position = map->findValidPos(rnd);
     actors.push_front(new Actor(position.first, position.second,25,TCODColor::blue,1,1));
     
+//place key
     position = map->findValidPos(rnd);
     actors.push_front(new Actor(position.first, position.second,140,TCODColor::yellow,3,1));
 
-    cntMax = rnd->getInt(4,9);
-    for (int cnt = 0; cnt < cntMax; cnt++){
-        position = map->findValidPos(rnd);
-        actors.push_front(new Actor(position.first, position.second,8,TCODColor::darkFlame,4,1));
-    }
+    populateMap(rnd);
 
     delete rnd;
+}
+
+void Engine::populateMap(TCODRandom *rnd) {
+    std::pair<int,int> position2;
+
+    int cntMax = rnd->getInt(4,9);
+    for (int cnt = 0; cnt < cntMax; cnt++){
+        position2 = map->findValidPos(rnd);
+        actors.push_front(new Actor(position2.first, position2.second,8,TCODColor::darkFlame,4,1));
+    }
 }
