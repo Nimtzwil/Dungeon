@@ -5,13 +5,17 @@
 
 class Actor{
 public:
-    int x,y;	//map position
-    int ch;	//ascii code
-    int facing;	//0=up 1=right 2=down 3=left
+//map position
+    int x,y;
+//ascii code
+    int ch;
+//0=up 1=right 2=down 3=left
+    int facing;
     int type;
-    TCODColor col;	//color
+    TCODColor col;
     int hp;
-    bool stinks; //determines if a scent path forms/stops
+//determines if a scent path forms/stops
+    bool stinks;
     Inventory *inv;
 
     Actor(int x, int y, int ch, const TCODColor &col, int typ, int health);

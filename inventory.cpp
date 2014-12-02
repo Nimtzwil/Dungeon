@@ -1,9 +1,6 @@
 #include <list>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 #include "libtcod.hpp"
 #include "inventory.h"
@@ -14,10 +11,10 @@ Loot::Loot(){
     name = "UN-NAMED";
 }
 
+//creates a random name for the Loot
 void Loot::createName(){
     static std::vector<std::string> styles = {"Iron", "Steel", "Orcish", "Dwarven", "Nord Hero", "Skyforge Steel", "Elven", "Nordic", "Glass", "Ebony", "Stalhrim", "Daedric", "Dragonbone"};
     static std::vector<std::string> types = {"Sword", "War Axe", "Mace", "Dagger", "Greatsword", "Battleaxe", "Warhammer", "Bow", "Crossbow"};
-//    static TCODRandom rnd = TCODRandom();
 
     name = styles[getLinRnd(0,styles.size()-1)];
     name += " ";

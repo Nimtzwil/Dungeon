@@ -3,5 +3,6 @@
 
 #include "libtcod.hpp"
 
+//static rnd # gen for the program
 int getLinRnd(int min, int max);
 #endif

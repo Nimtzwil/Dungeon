@@ -1,10 +1,10 @@
 #include <cmath>
-//#include <iostream>//debug
 #include <list>
 #include <utility>
 
 #include "libtcod.hpp"
 #include "map.h"
+#include "genFcns.h"
 
 Tile::Tile(){
     canWalk = true;
@@ -29,7 +29,8 @@ Map::Map(int width, int height) : width(width),height(height) {
     maxDepth = 5;
     maxRooms = std::pow(2, maxDepth+1) - 1;
     BSProoms=new Room[maxRooms];
-    for(int i=0; i < width; i++){	//sets up outer walls on edge of screen
+//sets up outer walls on edge of screen
+    for(int i=0; i < width; i++){
         setWall(i,0);
         setWall(i,height-1);
     }
@@ -45,35 +46,44 @@ Map::~Map() {
     delete [] tiles;
 }
 
-bool Map::isWall(int x, int y) const {	//is there a wall here?
+//is there a wall here?
+bool Map::isWall(int x, int y) const {
     return !tiles[x+y*width].canWalk;
 }
- 
-void Map::setWall(int x, int y) {	//create wall here
+
+//create wall here
+void Map::setWall(int x, int y) {
     tiles[x+y*width].canWalk=false;
 }
 
-bool Map::isSeen(int x, int y) const {	//tile has been seen
+//tile has been seen
+bool Map::isSeen(int x, int y) const {
     return tiles[x+y*width].Seen;
 }
 
-void Map::wasSeen(int x, int y) {	//tile was just seen
+//tile was just seen
+void Map::wasSeen(int x, int y) {
     tiles[x+y*width].Seen=true;
 }
 
+//sight of tile was lost
 void Map::wasBlocked(int x, int y) {
     tiles[x+y*width].Seen=false;
 }
 
-bool Map::isInfered(int x, int y) const {	//tile has been infered
+//tile has been infered
+bool Map::isInfered(int x, int y) const {
     return tiles[x+y*width].Infered;
 }
 
-void Map::wasInfered(int x, int y) {	//tile was just infered
+//tile was just infered
+void Map::wasInfered(int x, int y) {
     tiles[x+y*width].Infered=true;
 }
 
+//redetermines what tiles can be seen
 void Map::newView(int x, int y, int fac) {
+//checks all tiles and if its in range it is seen
     for (int mx=0; mx < width; mx++) {
         for (int my=0; my < height; my++) {
             if (floor(sqrt(pow((mx-x),2)+pow((my-y),2)))<5){
@@ -84,56 +94,13 @@ void Map::newView(int x, int y, int fac) {
                 wasBlocked(mx,my);
         }
     }
-/*    if(fac == 0){	//reveals all that are above
-        wasSeen(x-1,y);
-        wasSeen(x+1,y);
-        while(!isWall(x,y)){
-            wasSeen(x,y);
-            wasSeen(x,y-1);
-            wasInfered(x-1,y-1);
-            wasInfered(x+1,y-1);
-            y--;
-        }
-    }
-    else if(fac == 1){	//reveals all that are right
-        wasSeen(x,y-1);
-        wasSeen(x,y+1);
-        while(!isWall(x,y)){
-            wasSeen(x,y);
-            wasSeen(x+1,y);
-            wasInfered(x+1,y-1);
-            wasInfered(x+1,y+1);
-            x++;
-        }
-    }
-    else if(fac == 2){	//reveals all that are below
-        wasSeen(x-1,y);
-        wasSeen(x+1,y);
-        while(!isWall(x,y)){
-            wasSeen(x,y);
-            wasSeen(x,y+1);
-            wasInfered(x-1,y+1);
-            wasInfered(x+1,y+1);
-            y++;
-        }
-    }
-    else if(fac == 3){	//reveals all that are left
-        wasSeen(x,y-1);
-        wasSeen(x,y+1);
-        while(!isWall(x,y)){
-            wasSeen(x,y);
-            wasSeen(x-1,y);
-            wasInfered(x-1,y-1);
-            wasInfered(x-1,y+1);
-            x--;
-        }
-    }*/
 }
 
 void Map::render() const {
     static const TCODColor seenWall(31,24,15);
     static const TCODColor inferedGround(50,50,50);
     static const TCODColor seenGround(100,100,100);
+//iterates through each tile to determine colors
     for (int x=0; x < width; x++) {
         for (int y=0; y < height; y++) {
             if (isSeen(x,y))
@@ -144,58 +111,68 @@ void Map::render() const {
     }
 }
 
-void Map::BSPDaedalus() {	//builds a dungeon
+//builds a dungeon
+void Map::BSPDaedalus() {
     level++;
     moves = 0;
 
+//for resetting the map
     for (int i=0; i <= width-1; i++){
         for (int j=0; j <= height-1; j++){
-            tiles[i+j*width].Seen=false;	//for resetting the map
+            tiles[i+j*width].Seen=false;
             tiles[i+j*width].Infered=true;
             tiles[i+j*width].canWalk = false;
             tiles[i+j*width].occupied = 0;
         }
     }
 
-    for (int k=0; k <= maxRooms-1; k++){    //"resets" rooms
+//"resets" rooms
+    for (int k=0; k <= maxRooms-1; k++){
         BSProoms[k].exists = false;
     }
 
-    TCODRandom *rnd = new TCODRandom();
+//rebuilds structure
     int inindex = 1;
-    BSPPartition(0,0,width-1,height-1,0,rnd, inindex);
+    BSPPartition(0,0,width-1,height-1,0,inindex);
     BSPconnectChildren(1);
-    delete rnd;
 }
 
-void Map::BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *rnd, int index){
+void Map::BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, int index){
     int split = 0;
     int breakout = 0;
-    int minSize = 8;    //appears to work like minSize+1 (eg. want 7 use 8)
+//works like minSize+1 (eg. want 7 use 8)
+    int minSize = 8;
 
-    if (depth < maxDepth){ //check if depth is max if not go deeper
-        if ((LRx-ULx)>(LRy-ULy)){   //split along x
-            split = rnd->getInt(ULx,LRx);
+//check if depth is max if not go deeper
+    if (depth < maxDepth){
+//split along x
+        if ((LRx-ULx)>(LRy-ULy)){
+            split = getLinRnd(ULx,LRx);
 
+//attempt to find a valid split line
             while((breakout<50)&&(((split-ULx)<minSize)||((LRy-ULy)<minSize)||((LRx-split+1)<minSize)||((LRy-ULy)<minSize))){
-                breakout++; //attempt to find a valid split line
-                split = rnd->getInt(ULx,LRx);
+                breakout++;
+                split = getLinRnd(ULx,LRx);
             }
 
-            if (breakout < 50){ //if valid line found recurse
-                BSPPartition(ULx,ULy,split,LRy,depth+1,rnd,2*index);
-                BSPPartition(split+1,ULy,LRx,LRy,depth+1,rnd,2*index+1);
+//if valid line found recurse
+            if (breakout < 50){ 
+                BSPPartition(ULx,ULy,split,LRy,depth+1,2*index);
+                BSPPartition(split+1,ULy,LRx,LRy,depth+1,2*index+1);
             }
-            else{   //else tell to build room
-                BSPPartition(ULx,ULy,LRx,LRy,maxDepth,rnd,index);
+//else tell to build room
+            else{
+                BSPPartition(ULx,ULy,LRx,LRy,maxDepth,index);
             }
         }
-        else{   //split along y
-            split = rnd->getInt(ULy,LRy);
+//split along y
+        else{
+            split = getLinRnd(ULy,LRy);
 
+//attempt to find a valid split line
             while((breakout<50)&&(((LRx-ULx)<minSize)||((split-ULy)<minSize)||((LRx-ULx)<minSize)||((LRy-split+1)<minSize))){
-                breakout++; //attempt to find a valid split line
-                split = rnd->getInt(ULy,LRy);
+                breakout++;
+                split = getLinRnd(ULy,LRy);
             }
 
             BSProoms[index-1].Ux=ULx;
@@ -203,21 +180,25 @@ void Map::BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom
             BSProoms[index-1].Lx=LRx;
             BSProoms[index-1].Ly=LRy;
 
-            if (breakout < 50){ //if valid line found recurse
-                BSPPartition(ULx,ULy,LRx,split,depth+1,rnd,2*index);
-                BSPPartition(ULx,split+1,LRx,LRy,depth+1,rnd,2*index+1);
+//if valid line found recurse
+            if (breakout < 50){
+                BSPPartition(ULx,ULy,LRx,split,depth+1,2*index);
+                BSPPartition(ULx,split+1,LRx,LRy,depth+1,2*index+1);
             }
-            else{   //else tell to build room
-                BSPPartition(ULx,ULy,LRx,LRy,maxDepth,rnd,index);
+//else tell to build room
+            else{
+                BSPPartition(ULx,ULy,LRx,LRy,maxDepth,index);
             }
         }
     }
-    else{   //else create rooms
-        BSProoms[index-1].exists=true; //choose random size
-        BSProoms[index-1].Ux=rnd->getInt(ULx+2,(LRx-ULx)/2 +ULx-2);
-        BSProoms[index-1].Uy=rnd->getInt(ULy+2,(LRy-ULy)/2 +ULy-2);
-        BSProoms[index-1].Lx=rnd->getInt((LRx-ULx)/2 +ULx+2,LRx-2);
-        BSProoms[index-1].Ly=rnd->getInt((LRy-ULy)/2 +ULy+2,LRy-2);
+//else create rooms
+    else{
+//choose random size
+        BSProoms[index-1].exists=true;
+        BSProoms[index-1].Ux=getLinRnd(ULx+2,(LRx-ULx)/2 +ULx-2);
+        BSProoms[index-1].Uy=getLinRnd(ULy+2,(LRy-ULy)/2 +ULy-2);
+        BSProoms[index-1].Lx=getLinRnd((LRx-ULx)/2 +ULx+2,LRx-2);
+        BSProoms[index-1].Ly=getLinRnd((LRy-ULy)/2 +ULy+2,LRy-2);
 
         makeRoom(BSProoms[index-1].Ux, BSProoms[index-1].Uy, BSProoms[index-1].Lx, BSProoms[index-1].Ly);
         
@@ -260,7 +241,7 @@ void Map::makeHallway(int Sx, int Sy, int Ex, int Ey){
             tiles[x+y*width].canWalk = true;
         }
         else{
-//else move horizontal
+//else move diagonal
             (*major) = (*major)+((*dmaj)/abs(*dmaj));
             tiles[x+y*width].canWalk = true;
             (*minor) = (*minor)+((*dmin)/abs(*dmin));
@@ -330,15 +311,16 @@ std::list<int> Map::BSPconnectChildren(int index){
     return Lchildren;
 }
 
-std::pair<int,int> Map::findValidPos(TCODRandom *rnd){
+//finds a random non-wall pt to return
+std::pair<int,int> Map::findValidPos(){
     std::pair<int,int> place;
     
-    place.first = rnd->getInt(0,width-1);
-    place.second = rnd->getInt(0,height-1);
+    place.first = getLinRnd(0,width-1);
+    place.second = getLinRnd(0,height-1);
 
     while(isWall(place.first,place.second)){
-        place.first = rnd->getInt(0,width-1);
-        place.second = rnd->getInt(0,height-1);
+        place.first = getLinRnd(0,width-1);
+        place.second = getLinRnd(0,height-1);
     }
     
     return place;

@@ -9,7 +9,7 @@ GUI::GUI(){
 
 void GUI::render(bool smell, int level, bool proceed, int moves, std::string equipped) const{
 
-    //render edges in red
+//render edges in red
     TCODConsole::root->setChar(0,45,201);
     TCODConsole::root->setCharForeground(0,45,borderColor);
     TCODConsole::root->setChar(0,48,200);
@@ -31,7 +31,7 @@ void GUI::render(bool smell, int level, bool proceed, int moves, std::string equ
         TCODConsole::root->setCharForeground(80,j,borderColor);
     }
 
-    //render smelly status
+//render smelly status
     int count = 0;
     std::string str = "Smelly: ";
     for (char c: str){
@@ -54,7 +54,7 @@ void GUI::render(bool smell, int level, bool proceed, int moves, std::string equ
         count++;
     }
 
-    //render proceed status
+//render proceed status
     str = "   Proceed? ";
     for (char c: str){
         TCODConsole::root->setChar(1+count,47,c);
@@ -68,7 +68,7 @@ void GUI::render(bool smell, int level, bool proceed, int moves, std::string equ
     TCODConsole::root->setCharForeground(1+count,47, TCODColor::chartreuse);
     count++;
     
-    //render level info
+//render level info
     count = 0;
     str = "Level: ";
     for (char c: str){
@@ -98,7 +98,7 @@ void GUI::render(bool smell, int level, bool proceed, int moves, std::string equ
         count++;
     }
 
-    //render equipment
+//render equipment
     str = "   Equipped: ";
     for (char c: str){
         TCODConsole::root->setChar(1+count,46,c);
@@ -106,7 +106,6 @@ void GUI::render(bool smell, int level, bool proceed, int moves, std::string equ
         count++;
     }
 
-    //str = std::to_string(moves);
     for (char c: equipped){
         TCODConsole::root->setChar(1+count,46,c);
         TCODConsole::root->setCharForeground(1+count,46, TCODColor::chartreuse);

@@ -20,7 +20,7 @@ public :
     void updateActors();
     void render();
     void initializeMap();
-    void populateMap(TCODRandom *rnd);
+    void populateMap();
 };
  
 extern Engine engine;

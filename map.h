@@ -5,12 +5,14 @@
 #include <utility>
 
 #include "libtcod.hpp"
-#include "genFcns.h"
 
 struct Tile {
-    bool canWalk; 	// can we walk through this tile?
-    bool Seen;		// has been seen by player
-    bool Infered;	// has been on edge of vision
+// can we walk through this tile?
+    bool canWalk;
+// has been seen by player
+    bool Seen;
+// has been on edge of vision
+    bool Infered;
     int occupied;
 
     Tile();
@@ -49,15 +51,18 @@ public:
     void wasInfered(int x, int y);
 
     void render() const;
-    void newView(int x, int y, int fac);    //updates view
+//updates view
+    void newView(int x, int y, int fac);
 
     void makeHallway(int Sx, int Sy, int Ex, int Ey);
     void makeRoom(int LLx, int LLy, int Rwidth, int height);
 
-    std::pair<int,int> findValidPos(TCODRandom *rnd);
+//finds a random non-wall pt to return
+    std::pair<int,int> findValidPos();
 
-    void BSPDaedalus();	//builds a dungeon
-    void BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, TCODRandom *rnd, int index);
+//builds a dungeon
+    void BSPDaedalus();
+    void BSPPartition(int ULx, int ULy, int LRx, int LRy, int depth, int index);
     std::list<int> BSPconnectChildren(int index);
 
 private:

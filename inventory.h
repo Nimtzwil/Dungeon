@@ -4,9 +4,6 @@
 #include <list>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 #include "libtcod.hpp"
 
@@ -16,6 +13,7 @@ struct Loot{
 
     Loot();
 
+//creates a random name for the loot
     void createName();
 };
 
