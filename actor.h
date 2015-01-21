@@ -16,6 +16,7 @@ public:
     int hp;
 //determines if a scent path forms/stops
     bool stinks;
+    int delay;
     Inventory *inv;
 
     Actor(int x, int y, int ch, const TCODColor &col, int typ, int health);

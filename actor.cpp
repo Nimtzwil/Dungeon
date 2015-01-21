@@ -8,6 +8,7 @@ facing = 0;
 type = typ;
 hp = health;
 stinks = false;
+delay = 100;
 inv = new Inventory();
 }
 

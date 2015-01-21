@@ -86,7 +86,7 @@ void Map::newView(int x, int y, int fac) {
 //checks all tiles and if its in range it is seen
     for (int mx=0; mx < width; mx++) {
         for (int my=0; my < height; my++) {
-            if (floor(sqrt(pow((mx-x),2)+pow((my-y),2)))<5){
+            if (floor(sqrt(pow((mx-x),2)+pow((my-y),2)))<7){
                 wasSeen(mx,my);
                 wasInfered(mx,my);
             }
@@ -120,7 +120,7 @@ void Map::BSPDaedalus() {
     for (int i=0; i <= width-1; i++){
         for (int j=0; j <= height-1; j++){
             tiles[i+j*width].Seen=false;
-            tiles[i+j*width].Infered=true;
+            tiles[i+j*width].Infered=false;
             tiles[i+j*width].canWalk = false;
             tiles[i+j*width].occupied = 0;
         }
